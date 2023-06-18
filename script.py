@@ -13,7 +13,7 @@ songs = pd.read_csv("songs.csv", sep=";")
 
 with open("songs_lyrics.csv", "a", newline="", encoding="utf-8") as csv_file:
     writer = csv.writer(csv_file, delimiter="|")
-    for _, song in songs.iloc[1397:].iterrows():
+    for _, song in songs.iloc.iterrows():
         is_ok = False
         while not is_ok:
             try:
