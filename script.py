@@ -1,25 +1,24 @@
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
 import lyricsgenius as lg
+import csv
+
+access_token = '8yvpmDv96aodI5vg660Afcby4XPdrhPrx4JCAM3souNcRYG9C2nF5TWg1'
+genius = lg.Genius(access_token)
+
+def get_lyrics(song_title, artist_name):
+    song = genius.search_song(song_title, artist_name)
+    return song.lyrics if song is not None else ""
 
 songs = pd.read_csv("songs.csv", sep=";")
-songs.head()
 
-def search_lyrics(song_title, artist_name):
-    access_token = '8yvpmDv96aodI5vg660Afcby4XPdrhPrx4JCAM3souNcRYG9C2nF5TWg1'
-    genius = lg.Genius(access_token)
-    song = genius.search_song(song_title, artist_name)
-    return song.lyrics if song is not None else None
-
-song_lyrics = pd.DataFrame(columns=['lyrics'], index=songs.index)
-
-song_lyrics = pd.read_csv('song_lyrics.csv', sep=';')
-for index, row in songs.iterrows():
-    if pd.isnull(song_lyrics.loc[index]['lyrics']):
-        try:
-            song_lyrics.loc[index] = search_lyrics(row['title'], row['artist'])
-            song_lyrics.to_csv('song_lyrics.csv', sep=';')
-        except:
-            continue
+with open("songs_lyrics.csv", "a", newline="", encoding="utf-8") as csv_file:
+    writer = csv.writer(csv_file, delimiter="|")
+    for _, song in songs.iloc[1397:].iterrows():
+        is_ok = False
+        while not is_ok:
+            try:
+                lyrics = get_lyrics(song.title, song.artist)
+                is_ok = True
+                writer.writerow([song.title, song.artist, lyrics])
+            except Exception as e:
+                continue
